@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Multiple AJAX Generated Images Galleries</title>
+    
+    <style>
+        body { 
+            font-family: Trebuchet MS, Arial;
+            margin:0px; 
+            background:#000; 
+            color:#CCC; 
+        }
+        #pagetop { 
+            position:fixed; 
+            background: #333; 
+            top:0;
+            left:120px;
+            padding:20px; 
+            font-size:36px; 
+            width:100%; 
+            border-bottom:#000 1px solid; 
+        }
+        thumbnailbox { 
+            float:left; 
+            margin-top:75px; 
+            width:120px; 
+            background:#292929; 
+        }
+        #thumbnailbox > div { 
+            width:100px; 
+            height:80px; 
+            overflow:hidden; 
+            margin:10px; 
+            cursor:pointer; 
+        }
+        #thumbnailbox > div > img { 
+            width:100px; 
+        }
+        #pictureframe { 
+            position:fixed; 
+            left:140px; 
+            top:100px; 
+            width:700px; 
+            text-align:center; 
+        }
+        #pictureframe > img { 
+            width:700px; 
+        }
+        #albummenubox { 
+            position:fixed; 
+            left:856px; 
+            top:100px; 
+            width:200px; 
+            background:#CCC; 
+            padding:12px; 
+            color:#000; 
+            border-radius: 10px; 
+        }
+        #albummenubox > a {
+            text-decoration: none;             
+        }
+    </style>
+    <script>
+        function ajax_json_gallery(folder) {
+            
+            var $thumbnailbox = $("#thumbnailbox");
+            var $pictureframe = $("#pictureframe");
+            var location = new FormData;
+            
+            location.append("folder", folder);
+            
+            $thumbnailbox.html("requesting...");
+                        
+            $.ajax({
+                type: 'POST',
+                url: 'Multiple Album AJAX Gallery.php',
+                dataType: 'json',
+                data: location,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    
+                    $pictureframe.html("<img src='" + data.img1.src + "'>");
+                    $thumbnailbox.html("");
+                    for(var object in data){
+                        
+                        if(data[object].src){
+                            
+                            $thumbnailbox.append('<div onclick="putinframe(\'' + data[object].src + '\')"><img src="' + data[object].src + '"></div>');
+                        }
+                    }
+        
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+
+                    $thumbnailbox.html("Something went wrong - Error:  " + thrownError + " " + ajaxOptions);
+
+                }
+
+            }); 
+
+        }
+        
+        function putinframe(src) {
+            
+            var $pictureframe = $("#pictureframe");
+            $pictureframe.html('<img src="' + src + '">');
+            
+        }
+        
+    </script>
+</head>
+
+<body>
+    <div id="pagetop">Dynamic Image Gallery</div>
+    <div id="thumbnailbox"></div>
+    <div id="pictureframe"></div>
+    
+    <div id="albummenubox">
+        <h3>My Photo Albums</h3>
+        <a href="#" onclick="return false" onmousedown="ajax_json_gallery('cars')">Cars</a><br>
+        <a href="#" onclick="return false" onmousedown="ajax_json_gallery('boats')">Boats</a><br>
+        <a href="#" onclick="return false" onmousedown="ajax_json_gallery('trains')">Trains</a><br>
+        <a href="#" onclick="return false" onmousedown="ajax_json_gallery('planes')">Planes</a><br>
+    </div>
+    
+    <script src="http://localhost/IanBrown/assets/js/jquery-1.12.3.min.js" type="text/javascript"></script>
+    <script>
+        
+        $(document).ready(function() {
+            
+            ajax_json_gallery('cars');
+            
+        });
+    
+    </script>
+</body>
+</html>
